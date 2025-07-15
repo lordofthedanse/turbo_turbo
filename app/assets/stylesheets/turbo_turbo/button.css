@@ -1,0 +1,24 @@
+.turbo-turbo-buttons {
+  @apply relative inline-flex items-center;
+}
+
+.turbo-turbo-button {
+  @apply relative inline-flex items-center rounded-md font-normal h-9 bg-primary-700 text-white focus:z-10 text-sm px-4 py-2.5 hover:bg-primary-900 drop-shadow-none shadow-none border-0 !important;
+
+  &:not(:first-child) {
+    @apply ml-3;
+  }
+
+  &.--cancel {
+    @apply bg-gray-200 text-gray-700 hover:bg-gray-300 !important;
+  }
+
+  &.--secondary {
+    @apply leading-6 rounded bg-white  py-2.5 px-3.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 block text-center font-normal
+  }
+}
+
+/* Legacy class names for backwards compatibility */
+.Buttons { @apply turbo-turbo-buttons; }
+.Button { @apply turbo-turbo-button; }
+

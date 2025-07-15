@@ -1,13 +1,93 @@
 AllCops:
-  TargetRubyVersion: 2.6
+  NewCops: enable
+  TargetRubyVersion: 3.3.6
+  Exclude:
+    - 'bin/**/*'
+    - 'log/**/*'
+    - 'tmp/**/*'
+    - 'vendor/**/*'
+    - 'node_modules/**/*'
 
-Style/StringLiterals:
-  Enabled: true
-  EnforcedStyle: double_quotes
+# Exclude generator files from complex metrics since they are one-time setup code
+Metrics/ClassLength:
+  Exclude:
+    - 'lib/generators/**/*'
+    - 'spec/**/*'
 
-Style/StringLiteralsInInterpolation:
-  Enabled: true
-  EnforcedStyle: double_quotes
+Metrics/MethodLength:
+  Exclude:
+    - 'lib/generators/**/*'
+    - 'spec/**/*'
+    - 'lib/turbo_turbo/form_helper.rb'
+    - 'lib/turbo_turbo/controller_helpers.rb'
+
+Metrics/AbcSize:
+  Exclude:
+    - 'lib/generators/**/*'
+    - 'spec/**/*'
+    - 'lib/turbo_turbo/form_helper.rb'
+
+Metrics/CyclomaticComplexity:
+  Exclude:
+    - 'lib/generators/**/*'
+    - 'spec/**/*'
+    - 'lib/turbo_turbo/form_helper.rb'
+
+Metrics/PerceivedComplexity:
+  Exclude:
+    - 'lib/generators/**/*'
+    - 'spec/**/*'
+    - 'lib/turbo_turbo/form_helper.rb'
+
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'
+    - '*.gemspec'
+    - 'lib/turbo_turbo/standard_actions.rb'
+
+Metrics/ModuleLength:
+  Exclude:
+    - 'spec/**/*'
+    - 'lib/turbo_turbo/controller_helpers.rb'
 
 Layout/LineLength:
   Max: 120
+  Exclude:
+    - 'lib/generators/**/*'
+    - 'spec/**/*'
+    - 'lib/turbo_turbo/form_helper.rb'
+
+# ViewComponent `initialize` methods don't need to call super
+# This is a false positive - ViewComponent handles initialization differently
+Lint/MissingSuper:
+  Exclude:
+    - 'app/components/**/*'
+
+# Allow constants in blocks for specs
+Lint/ConstantDefinitionInBlock:
+  Exclude:
+    - 'spec/**/*'
+
+# Specs can use predicate methods without ?
+Naming/PredicateMethod:
+  Exclude:
+    - 'spec/**/*'
+
+# Allow getter/setter methods in specs
+Naming/AccessorMethodName:
+  Exclude:
+    - 'spec/**/*'
+
+# Allow boolean parameters in specs
+Style/OptionalBooleanParameter:
+  Exclude:
+    - 'spec/**/*'
+
+# Allow string concatenation in specs
+Style/StringConcatenation:
+  Exclude:
+    - 'spec/**/*'
+
+# Documentation is handled in README for this gem
+Style/Documentation:
+  Enabled: false

@@ -7,13 +7,13 @@ module TurboTurbo
   # == Basic Usage
   #
   # Instead of writing:
-  #   = simple_form_for service_provider, url: [:admin, service_provider], 
-  #       data: { 
-  #         turbo_turbo__modal_target: "form", 
-  #         action: "turbo:submit-end->turbo-turbo--modal#closeOnSuccess" 
+  #   = simple_form_for service_provider, url: [:admin, service_provider],
+  #       data: {
+  #         turbo_turbo__modal_target: "form",
+  #         action: "turbo:submit-end->turbo-turbo--modal#closeOnSuccess"
   #       } do |form|
-  #     .ModalContent
-  #       #error_message
+  #     .ModalContent-turbo-turbo
+  #       #error_message_turbo_turbo
   #       [user-specific fields here]
   #
   # You can now write:
@@ -33,9 +33,6 @@ module TurboTurbo
   #   turbo_form_for(object,
   #     url: custom_path,
   #     builder: :form_with,              # Form builder to use
-  #     error_target: "custom_errors",    # ID of error message container
-  #     auto_close: false,                # Disable auto-close on success
-  #     modal_wrapper_class: "MyWrapper", # Custom CSS class for wrapper
   #     data: { custom_attr: "value" }    # Additional data attributes
   #   )
   #
@@ -43,7 +40,7 @@ module TurboTurbo
     extend ActiveSupport::Concern
 
     # Main method for creating turbo-enabled modal forms
-    # 
+    #
     # @param object [ActiveRecord::Base] The object for the form
     # @param options [Hash] Form options including url, method, etc.
     # @option options [Symbol] :builder (:simple_form) Form builder to use (:simple_form, :form_with, :form_for)
@@ -51,95 +48,88 @@ module TurboTurbo
     # @option options [Symbol] :method HTTP method for the form
     # @option options [Hash] :data Additional data attributes to merge
     # @option options [Hash] :html Additional HTML attributes for the form
-    # @option options [String] :error_target (:error_message) ID of error message container
-    # @option options [Boolean] :auto_close (true) Whether to close modal on successful submission
-    # @option options [String] :modal_wrapper_class (.ModalContent) CSS class for modal content wrapper
     # @yield [form] Form builder object
-    def turbo_form_for(object, options = {}, &block)
+    def turbo_form_for(object, options = {}, &)
       # Extract and set defaults
       builder_type = options.delete(:builder) || :simple_form
-      error_target = options.delete(:error_target) || "error_message"
-      auto_close = options.delete(:auto_close) != false # Default to true unless explicitly false
-      modal_wrapper_class = options.delete(:modal_wrapper_class) || "ModalContent"
-      
+
       # Build default data attributes for turbo modal integration
       default_data = {
-        turbo_turbo__modal_target: "form"
+        turbo_turbo__modal_target: 'form'
       }
-      
-      # Add auto-close behavior if enabled
-      if auto_close
-        default_data[:action] = "turbo:submit-end->turbo-turbo--modal#closeOnSuccess"
-      end
-      
+
+      # Add auto-close action if enabled
+      default_data[:action] = 'turbo:submit-end->turbo-turbo--modal#closeOnSuccess'
+
       # Merge user-provided data attributes
       user_data = options.delete(:data) || {}
       merged_data = default_data.merge(user_data)
-      
+
       # Set up form options
       form_options = options.merge(data: merged_data)
-      
+
       # Ensure URL is set if not provided
       unless form_options[:url]
         if object.respond_to?(:persisted?) && object.persisted?
           form_options[:url] = object
         else
           # Try to infer URL from object class
-          model_name = object.class.model_name
-          form_options[:url] = [:admin, object] if defined?(controller) && controller.class.name.include?("Admin")
+          object.class.model_name
+          form_options[:url] = [:admin, object] if defined?(controller) && controller.class.name.include?('Admin')
         end
       end
-      
+
       # Generate the form based on builder type
       form_html = case builder_type
                   when :simple_form
-                    build_simple_form(object, form_options, &block)
+                    build_simple_form(object, form_options, &)
                   when :form_with
-                    build_form_with(object, form_options, &block)
+                    build_form_with(object, form_options, &)
                   when :form_for
-                    build_form_for(object, form_options, &block)
+                    build_form_for(object, form_options, &)
                   else
-                    raise ArgumentError, "Unknown form builder: #{builder_type}. Supported builders: :simple_form, :form_with, :form_for"
+                    raise ArgumentError,
+                          "Unknown form builder: #{builder_type}. Supported builders: :simple_form, :form_with, :form_for"
                   end
-      
+
       # Wrap the form in modal content structure
-      content_tag(:div, class: modal_wrapper_class) do
-        concat content_tag(:div, "", id: error_target)
+      content_tag(:div, class: 'ModalContent-turbo-turbo') do
+        concat content_tag(:div, '', id: 'error_message_turbo_turbo')
         concat form_html
       end
     end
 
     # Convenience method for SimpleForm (most common case)
-    def turbo_simple_form_for(object, options = {}, &block)
-      turbo_form_for(object, options.merge(builder: :simple_form), &block)
+    def turbo_simple_form_for(object, options = {}, &)
+      turbo_form_for(object, options.merge(builder: :simple_form), &)
     end
 
     # Convenience method for Rails form_with
-    def turbo_form_with(model:, **options, &block)
-      turbo_form_for(model, options.merge(builder: :form_with), &block)
+    def turbo_form_with(model:, **options, &)
+      turbo_form_for(model, options.merge(builder: :form_with), &)
     end
 
     private
 
-    def build_simple_form(object, options, &block)
-      if defined?(SimpleForm) && respond_to?(:simple_form_for)
-        simple_form_for(object, options, &block)
-      else
-        raise "SimpleForm is not available. Install the simple_form gem or use a different builder."
+    def build_simple_form(object, options, &)
+      unless defined?(SimpleForm) && respond_to?(:simple_form_for)
+        raise 'SimpleForm is not available. Install the simple_form gem or use a different builder.'
       end
+
+      simple_form_for(object, options, &)
     end
 
-    def build_form_with(object, options, &block)
+    def build_form_with(object, options, &)
       # Convert object-based options to form_with format
       form_with_options = options.dup
       form_with_options[:model] = object
       form_with_options.delete(:url) if form_with_options[:url] == object
-      
-      form_with(**form_with_options, &block)
+
+      form_with(**form_with_options, &)
     end
 
-    def build_form_for(object, options, &block)
-      form_for(object, options, &block)
+    def build_form_for(object, options, &)
+      form_for(object, options, &)
     end
   end
 end

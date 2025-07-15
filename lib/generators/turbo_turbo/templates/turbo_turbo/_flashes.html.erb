@@ -1,0 +1,8 @@
+<div id="flashes-turbo">
+  <% flash.each do |key, value| %>
+    <% key = convert_flash_keys(key) %>
+    <% next unless ApplicationController._flash_types.include?(key.to_sym) %>
+    <% value = { message: value } if value.is_a?(String) %>
+    <%= render("TurboTurbo::Alerts::#{key.titleize}Component".constantize.new(value)) %>
+  <% end %>
+</div>

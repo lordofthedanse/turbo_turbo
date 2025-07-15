@@ -1,0 +1,15 @@
+en:
+  turbo_turbo:
+    flash:
+      success:
+        create: "%{resource} created!"
+        update: "%{resource} updated!"
+        destroy: "%{resource} deleted!"
+        archive: "%{resource} archived!"
+        restore: "%{resource} restored!"
+        upload: "%{resource} uploaded!"
+        toggle_resolved: "%{resource} resolved!"
+        email_modal: "%{resource} updated!"
+        default: "%{resource} %{action}d!"
+      error:
+        default: "We encountered an error trying to %{action} %{resource}."

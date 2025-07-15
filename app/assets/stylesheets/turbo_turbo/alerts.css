@@ -1,0 +1,16 @@
+#turbo-turbo-flashes {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 10000;
+  width: 100%;
+}
+
+/* Legacy selector for backwards compatibility */
+#flashes {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 10000;
+  width: 100%;
+}

@@ -1,0 +1,6 @@
+<div id="modal_footer" class="ModalFooterActions flex-shrink-0" data-turbo-turbo--modal-target="footer">
+  <% unless @skip_close %>
+    <%= link_to @close_label, "", data: { action: "turbo-turbo--modal#closeModal" }, class: "Button --cancel flex-1 justify-center" %>
+  <% end %>
+  <%= content %>
+</div>
