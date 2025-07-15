@@ -55,11 +55,11 @@ module TurboTurbo
 
       # Build default data attributes for turbo modal integration
       default_data = {
-        turbo_turbo__modal_target: 'form'
+        turbo_turbo__modal_target: "form"
       }
 
       # Add auto-close action if enabled
-      default_data[:action] = 'turbo:submit-end->turbo-turbo--modal#closeOnSuccess'
+      default_data[:action] = "turbo:submit-end->turbo-turbo--modal#closeOnSuccess"
 
       # Merge user-provided data attributes
       user_data = options.delete(:data) || {}
@@ -75,7 +75,7 @@ module TurboTurbo
         else
           # Try to infer URL from object class
           object.class.model_name
-          form_options[:url] = [:admin, object] if defined?(controller) && controller.class.name.include?('Admin')
+          form_options[:url] = [:admin, object] if defined?(controller) && controller.class.name.include?("Admin")
         end
       end
 
@@ -93,8 +93,8 @@ module TurboTurbo
                   end
 
       # Wrap the form in modal content structure
-      content_tag(:div, class: 'ModalContent-turbo-turbo') do
-        concat content_tag(:div, '', id: 'error_message_turbo_turbo')
+      content_tag(:div, class: "ModalContent-turbo-turbo") do
+        concat content_tag(:div, "", id: "error_message_turbo_turbo")
         concat form_html
       end
     end
@@ -113,7 +113,7 @@ module TurboTurbo
 
     def build_simple_form(object, options, &)
       unless defined?(SimpleForm) && respond_to?(:simple_form_for)
-        raise 'SimpleForm is not available. Install the simple_form gem or use a different builder.'
+        raise "SimpleForm is not available. Install the simple_form gem or use a different builder."
       end
 
       simple_form_for(object, options, &)

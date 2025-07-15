@@ -54,9 +54,9 @@ module TurboTurbo
     # Converts string boolean values to actual booleans
     def convert_to_boolean(field)
       case field
-      when 'false', '0'
+      when "false", "0"
         false
-      when 'true', '1'
+      when "true", "1"
         true
       else
         field

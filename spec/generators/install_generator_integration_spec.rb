@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
-require 'tempfile'
-require 'fileutils'
+require "spec_helper"
+require "tempfile"
+require "fileutils"
 
-RSpec.describe 'TurboTurbo Install Generator Integration' do
+RSpec.describe "TurboTurbo Install Generator Integration" do
   let(:temp_dir) { Dir.mktmpdir }
-  let(:app_views_dir) { File.join(temp_dir, 'app', 'views', 'layouts') }
-  let(:erb_layout_file) { File.join(app_views_dir, 'application.html.erb') }
-  let(:slim_layout_file) { File.join(app_views_dir, 'application.html.slim') }
+  let(:app_views_dir) { File.join(temp_dir, "app", "views", "layouts") }
+  let(:erb_layout_file) { File.join(app_views_dir, "application.html.erb") }
+  let(:slim_layout_file) { File.join(app_views_dir, "application.html.slim") }
 
   before do
     FileUtils.mkdir_p(app_views_dir)
@@ -26,8 +26,8 @@ RSpec.describe 'TurboTurbo Install Generator Integration' do
   class TestGenerator
     def modify_layout_file
       layout_files = [
-        'app/views/layouts/application.html.erb',
-        'app/views/layouts/application.html.slim'
+        "app/views/layouts/application.html.erb",
+        "app/views/layouts/application.html.slim"
       ]
 
       layout_file = layout_files.find { |file| File.exist?(file) }
@@ -37,7 +37,7 @@ RSpec.describe 'TurboTurbo Install Generator Integration' do
       content = File.read(layout_file)
       original_content = content.dup
 
-      content = if layout_file.end_with?('.slim')
+      content = if layout_file.end_with?(".slim")
                   modify_slim_layout(content)
                 else
                   modify_erb_layout(content)
@@ -63,7 +63,7 @@ RSpec.describe 'TurboTurbo Install Generator Integration' do
             controller_list = ::Regexp.last_match(2)
             suffix = ::Regexp.last_match(3)
             controllers = controller_list.strip.split(/\s+/)
-            controllers << 'modal' unless controllers.include?('modal')
+            controllers << "modal" unless controllers.include?("modal")
             "#{prefix}#{controllers.join(' ')}#{suffix}"
           end
         end
@@ -89,7 +89,7 @@ RSpec.describe 'TurboTurbo Install Generator Integration' do
       end
 
       # Add ModalComponent before closing body tag if not present
-      unless content.include?('ModalComponent')
+      unless content.include?("ModalComponent")
         content = content.gsub(%r{(\s*)</body>}) do
           "#{::Regexp.last_match(1)}  <%= render TurboTurbo::ModalComponent.new %>\n#{::Regexp.last_match(1)}</body>"
         end
@@ -108,7 +108,7 @@ RSpec.describe 'TurboTurbo Install Generator Integration' do
             controller_list = ::Regexp.last_match(2)
             suffix = ::Regexp.last_match(3)
             controllers = controller_list.strip.split(/\s+/)
-            controllers << 'modal' unless controllers.include?('modal')
+            controllers << "modal" unless controllers.include?("modal")
             "#{prefix}#{controllers.join(' ')}#{suffix}"
           end
         end
@@ -134,7 +134,7 @@ RSpec.describe 'TurboTurbo Install Generator Integration' do
       end
 
       # Add ModalComponent at end of body if not present
-      unless content.include?('ModalComponent')
+      unless content.include?("ModalComponent")
         # Find the last line with content before implicit body closing
         lines = content.split("\n")
         body_found = false
@@ -149,7 +149,7 @@ RSpec.describe 'TurboTurbo Install Generator Integration' do
         end
 
         if insert_index >= 0
-          lines.insert(insert_index + 1, '  = render TurboTurbo::ModalComponent.new')
+          lines.insert(insert_index + 1, "  = render TurboTurbo::ModalComponent.new")
           content = lines.join("\n")
         end
       end
@@ -160,9 +160,9 @@ RSpec.describe 'TurboTurbo Install Generator Integration' do
 
   let(:generator) { TestGenerator.new }
 
-  describe 'ERB layout modification' do
-    context 'with no existing data-controller' do
-      it 'adds modal controller and all components' do
+  describe "ERB layout modification" do
+    context "with no existing data-controller" do
+      it "adds modal controller and all components" do
         File.write(erb_layout_file, <<~ERB)
           <!DOCTYPE html>
           <html>
@@ -183,12 +183,12 @@ RSpec.describe 'TurboTurbo Install Generator Integration' do
         expect(modified_content).to include('data-controller="modal"')
         expect(modified_content).to include("<%= render 'turbo_turbo/flashes' %>")
         expect(modified_content).to include("<%= render 'turbo_turbo/modal_background' %>")
-        expect(modified_content).to include('<%= render TurboTurbo::ModalComponent.new %>')
+        expect(modified_content).to include("<%= render TurboTurbo::ModalComponent.new %>")
       end
     end
 
-    context 'with existing data-controller' do
-      it 'adds modal to existing controllers' do
+    context "with existing data-controller" do
+      it "adds modal to existing controllers" do
         File.write(erb_layout_file, <<~ERB)
           <!DOCTYPE html>
           <html>
@@ -207,7 +207,7 @@ RSpec.describe 'TurboTurbo Install Generator Integration' do
       end
     end
 
-    context 'when modal already exists' do
+    context "when modal already exists" do
       it "doesn't modify the file" do
         original_content = <<~ERB
           <!DOCTYPE html>
@@ -233,9 +233,9 @@ RSpec.describe 'TurboTurbo Install Generator Integration' do
     end
   end
 
-  describe 'Slim layout modification' do
-    context 'with no existing data-controller' do
-      it 'adds modal controller and all components' do
+  describe "Slim layout modification" do
+    context "with no existing data-controller" do
+      it "adds modal controller and all components" do
         File.write(slim_layout_file, <<~SLIM)
           doctype html
           html
@@ -253,12 +253,12 @@ RSpec.describe 'TurboTurbo Install Generator Integration' do
         expect(modified_content).to include('body data-controller="modal"')
         expect(modified_content).to include('= render "turbo_turbo/flashes"')
         expect(modified_content).to include('= render "turbo_turbo/modal_background"')
-        expect(modified_content).to include('= render TurboTurbo::ModalComponent.new')
+        expect(modified_content).to include("= render TurboTurbo::ModalComponent.new")
       end
     end
 
-    context 'with CSS classes on body' do
-      it 'preserves classes and adds data-controller' do
+    context "with CSS classes on body" do
+      it "preserves classes and adds data-controller" do
         File.write(slim_layout_file, <<~SLIM)
           doctype html
           html.h-full
@@ -276,33 +276,33 @@ RSpec.describe 'TurboTurbo Install Generator Integration' do
     end
   end
 
-  describe 'layout file detection' do
-    context 'when both ERB and Slim exist' do
-      it 'prefers ERB layout' do
-        File.write(erb_layout_file, '<body><%= yield %></body>')
+  describe "layout file detection" do
+    context "when both ERB and Slim exist" do
+      it "prefers ERB layout" do
+        File.write(erb_layout_file, "<body><%= yield %></body>")
         File.write(slim_layout_file, 'body\n  = yield')
 
         result = generator.modify_layout_file
 
-        expect(result[:file]).to eq('app/views/layouts/application.html.erb')
+        expect(result[:file]).to eq("app/views/layouts/application.html.erb")
       end
     end
 
-    context 'when no layout file exists' do
-      it 'returns nil' do
+    context "when no layout file exists" do
+      it "returns nil" do
         result = generator.modify_layout_file
 
         expect(result).to be_nil
       end
     end
 
-    context 'when only Slim exists' do
-      it 'uses Slim layout' do
+    context "when only Slim exists" do
+      it "uses Slim layout" do
         File.write(slim_layout_file, 'body\n  = yield')
 
         result = generator.modify_layout_file
 
-        expect(result[:file]).to eq('app/views/layouts/application.html.slim')
+        expect(result[:file]).to eq("app/views/layouts/application.html.slim")
       end
     end
   end

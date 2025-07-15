@@ -38,7 +38,7 @@ module TurboTurbo
         find(close_button, match: :first).click
       else
         # If no close button, try clicking the backdrop to close
-        backdrop = '.ModalBackdrop-turbo-turbo'
+        backdrop = ".ModalBackdrop-turbo-turbo"
         return true unless page.has_css?(backdrop, visible: true)
 
         find(backdrop).click

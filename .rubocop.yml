@@ -78,6 +78,9 @@ Naming/AccessorMethodName:
   Exclude:
     - 'spec/**/*'
 
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
 # Allow boolean parameters in specs
 Style/OptionalBooleanParameter:
   Exclude:

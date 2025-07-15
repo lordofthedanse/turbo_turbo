@@ -43,13 +43,13 @@ module TurboTurbo
       if validation_error_action?
         render turbo_stream: turbo_stream.update(
           :error_message_turbo_turbo,
-          partial: 'shared/turbo_turbo/error_message',
+          partial: "shared/turbo_turbo/error_message",
           locals: { message: validation_error_messages(object) }
         ), status: :unprocessable_entity
       elsif flash_error_action?
-        render turbo_stream: turbo_dstream.replace(
-          :flashes,
-          partial: 'layouts/turbo_turbo/flashes',
+        render turbo_stream: turbo_stream.replace(
+          :flashes_turbo_turbo,
+          partial: "layouts/turbo_turbo/flashes",
           locals: { flash: turbo_flash_error_message(flash_reference(object, flash_naming_attribute)) }
         )
       end
@@ -78,24 +78,24 @@ module TurboTurbo
     # ========================================
 
     def replace_turbo_flashes(flash_reference)
-      turbo_stream.replace(:flashes, partial: 'layouts/turbo_turbo/flashes',
-                                     locals: { flash: turbo_flash_success_message(flash_reference) })
+      turbo_stream.replace(:flashes_turbo_turbo, partial: "layouts/turbo_turbo/flashes",
+                                                 locals: { flash: turbo_flash_success_message(flash_reference) })
     end
 
     def turbo_flash_error_message(flash_reference)
-      action_verb = action_name == 'destroy' ? 'delete' : action_name
+      action_verb = action_name == "destroy" ? "delete" : action_name
 
-      { error: I18n.t('turbo_turbo.flash.error.default',
+      { error: I18n.t("turbo_turbo.flash.error.default",
                       action: action_verb,
                       resource: flash_reference,
-                      default: 'We encountered an error trying to %<action>s %<resource>s.') }
+                      default: "We encountered an error trying to %<action>s %<resource>s.") }
     end
 
     def turbo_flash_success_message(flash_reference)
       message = I18n.t("turbo_turbo.flash.success.#{action_name}",
                        resource: flash_reference,
                        action: action_name,
-                       default: I18n.t('turbo_turbo.flash.success.default',
+                       default: I18n.t("turbo_turbo.flash.success.default",
                                        resource: flash_reference,
                                        action: action_name,
                                        default: "#{flash_reference} #{action_name}d!"))

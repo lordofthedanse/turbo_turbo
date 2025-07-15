@@ -1,40 +1,40 @@
 # frozen_string_literal: true
 
-require 'rails/generators/base'
+require "rails/generators/base"
 
 module TurboTurbo
   module Generators
     class LayoutGenerator < Rails::Generators::Base
-      desc 'Install TurboTurbo components to a custom layout file'
-      source_root File.expand_path('templates', __dir__)
+      desc "Install TurboTurbo components to a custom layout file"
+      source_root File.expand_path("templates", __dir__)
 
-      argument :layout_name, type: :string, default: 'application',
-                             desc: 'The layout file name (without extension)'
+      argument :layout_name, type: :string, default: "application",
+                             desc: "The layout file name (without extension)"
 
       class_option :skip_flash, type: :boolean, default: false,
-                                desc: 'Skip adding flash-related components (flashes render)'
+                                desc: "Skip adding flash-related components (flashes render)"
 
       class_option :skip_modal, type: :boolean, default: false,
-                                desc: 'Skip adding modal-related components (data controller, modal background, ModalComponent)'
+                                desc: "Skip adding modal-related components (data controller, modal background, ModalComponent)"
 
       def check_if_everything_skipped
         return unless options[:skip_flash] && options[:skip_modal]
 
-        say 'You skipped everything, so we did nothing!', :yellow
+        say "You skipped everything, so we did nothing!", :yellow
         exit(0)
       end
 
       def ensure_layout_partials_exist
-        empty_directory 'app/views/turbo_turbo'
+        empty_directory "app/views/turbo_turbo"
 
-        if !options[:skip_flash] && !File.exist?('app/views/turbo_turbo/_flashes.html.erb')
-          copy_file 'turbo_turbo/_flashes.html.erb', 'app/views/turbo_turbo/_flashes.html.erb'
+        if !options[:skip_flash] && !File.exist?("app/views/turbo_turbo/_flashes.html.erb")
+          copy_file "turbo_turbo/_flashes.html.erb", "app/views/turbo_turbo/_flashes.html.erb"
         end
 
         return if options[:skip_modal]
-        return if File.exist?('app/views/turbo_turbo/_modal_background.html.erb')
+        return if File.exist?("app/views/turbo_turbo/_modal_background.html.erb")
 
-        copy_file 'turbo_turbo/_modal_background.html.erb', 'app/views/turbo_turbo/_modal_background.html.erb'
+        copy_file "turbo_turbo/_modal_background.html.erb", "app/views/turbo_turbo/_modal_background.html.erb"
       end
 
       def modify_custom_layout_file
@@ -54,7 +54,7 @@ module TurboTurbo
         content = File.read(layout_file)
         original_content = content.dup
 
-        content = if layout_file.end_with?('.slim')
+        content = if layout_file.end_with?(".slim")
                     modify_slim_layout(content)
                   else
                     modify_erb_layout(content)
@@ -72,21 +72,21 @@ module TurboTurbo
         say "\nTurboTurbo components added to #{layout_name} layout!", :green
         say "\nComponents added:"
 
-        say '✅ turbo_turbo/flashes render' unless options[:skip_flash]
+        say "✅ turbo_turbo/flashes render" unless options[:skip_flash]
 
         unless options[:skip_modal]
-          say '✅ turbo-turbo--modal data controller'
-          say '✅ turbo_turbo/modal_background render'
-          say '✅ TurboTurbo::ModalComponent render'
+          say "✅ turbo-turbo--modal data controller"
+          say "✅ turbo_turbo/modal_background render"
+          say "✅ TurboTurbo::ModalComponent render"
         end
 
         return unless options[:skip_flash] || options[:skip_modal]
 
         say "\nSkipped components:"
-        say '⏭️  Flash-related: turbo_turbo/flashes render' if options[:skip_flash]
+        say "⏭️  Flash-related: turbo_turbo/flashes render" if options[:skip_flash]
         return unless options[:skip_modal]
 
-        say '⏭️  Modal-related: data controller, modal background, ModalComponent'
+        say "⏭️  Modal-related: data controller, modal background, ModalComponent"
       end
 
       private
@@ -102,7 +102,7 @@ module TurboTurbo
                 controller_list = ::Regexp.last_match(2)
                 suffix = ::Regexp.last_match(3)
                 controllers = controller_list.strip.split(/\s+/)
-                controllers << 'turbo-turbo--modal' unless controllers.include?('turbo-turbo--modal')
+                controllers << "turbo-turbo--modal" unless controllers.include?("turbo-turbo--modal")
                 "#{prefix}#{controllers.join(' ')}#{suffix}"
               end
             end
@@ -138,7 +138,7 @@ module TurboTurbo
         end
 
         # Add ModalComponent before closing body tag if not present and not skipped
-        if !options[:skip_modal] && !content.include?('TurboTurbo::ModalComponent')
+        if !options[:skip_modal] && !content.include?("TurboTurbo::ModalComponent")
           content = content.gsub(%r{(\s*)</body>}) do
             "#{::Regexp.last_match(1)}  <%= render TurboTurbo::ModalComponent.new %>\n#{::Regexp.last_match(1)}</body>"
           end
@@ -158,7 +158,7 @@ module TurboTurbo
                 controller_list = ::Regexp.last_match(2)
                 suffix = ::Regexp.last_match(3)
                 controllers = controller_list.strip.split(/\s+/)
-                controllers << 'turbo-turbo--modal' unless controllers.include?('turbo-turbo--modal')
+                controllers << "turbo-turbo--modal" unless controllers.include?("turbo-turbo--modal")
                 "#{prefix}#{controllers.join(' ')}#{suffix}"
               end
             end
@@ -194,7 +194,7 @@ module TurboTurbo
         end
 
         # Add TurboTurbo::ModalComponent at end of body if not present and not skipped
-        if !options[:skip_modal] && !content.include?('TurboTurbo::ModalComponent')
+        if !options[:skip_modal] && !content.include?("TurboTurbo::ModalComponent")
           # Find the last line with content before implicit body closing
           lines = content.split("\n")
           body_found = false
@@ -209,7 +209,7 @@ module TurboTurbo
           end
 
           if insert_index >= 0
-            lines.insert(insert_index + 1, '  = render TurboTurbo::ModalComponent.new')
+            lines.insert(insert_index + 1, "  = render TurboTurbo::ModalComponent.new")
             content = lines.join("\n")
           end
         end
