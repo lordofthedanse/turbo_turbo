@@ -57,6 +57,7 @@ The installer automatically:
 - **Copies namespaced JavaScript controllers** to `app/javascript/controllers/turbo_turbo/`
 - **Registers controllers** (`turbo-turbo--modal`, `turbo-turbo--flash`) in Stimulus index.js
 - **Configures ApplicationController** with `TurboTurbo::ControllerHelpers` and flash types
+- **Copies TurboTurbo CSS** to `app/assets/stylesheets/turbo_turbo/` (includes component CSS files and base.css, which just imports the component CSS files)
 - **Imports TurboTurbo CSS** into your main stylesheet
 - **Copies layout partials** for modal background and flashes to `app/views/turbo_turbo/`
 - **Intelligently modifies your layout file** to include required components
@@ -71,6 +72,7 @@ The installer automatically modifies your `app/views/layouts/application.html.er
 ✅ **Insert modal background render** after flashes  
 ✅ **Append TurboTurbo::ModalComponent** at the end of the body  
 ✅ **Configure ApplicationController** with TurboTurbo helpers and flash types  
+✅ **Copy TurboTurbo CSS** to `app/assets/stylesheets/turbo_turbo/` (all CSS files)
 ✅ **Import TurboTurbo CSS** into your main stylesheet  
 
 **Before:**

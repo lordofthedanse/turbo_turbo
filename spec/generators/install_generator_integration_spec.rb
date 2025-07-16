@@ -51,6 +51,52 @@ RSpec.describe "TurboTurbo Install Generator Integration" do
       end
     end
 
+    def add_css_import
+      copy_css_file_to_app
+      add_css_import_to_main_file
+    end
+
+    def copy_css_file_to_app
+      # Copy the TurboTurbo CSS files from the gem to the app
+      gem_css_dir = File.join(gem_root, "app/assets/stylesheets")
+      app_css_dir = "app/assets/stylesheets"
+
+      # CSS subdirectory (now contains base.css and component CSS files)
+      gem_css_subdir = File.join(gem_css_dir, "turbo_turbo")
+      app_css_subdir = File.join(app_css_dir, "turbo_turbo")
+
+      return unless File.exist?(gem_css_subdir)
+      return if File.exist?(app_css_subdir)
+
+      # Copy CSS subdirectory (contains base.css and component files)
+      FileUtils.cp_r(gem_css_subdir, app_css_subdir)
+    end
+
+    def add_css_import_to_main_file
+      css_files = [
+        "app/assets/stylesheets/application.tailwind.css",
+        "app/assets/stylesheets/application.css"
+      ]
+
+      css_file = css_files.find { |file| File.exist?(file) }
+      return unless css_file
+
+      content = File.read(css_file)
+
+      # Check if import already exists
+      if content.include?('@import "turbo_turbo"') || content.include?('@import "./turbo_turbo"') || content.include?('@import "./turbo_turbo.css"') || content.include?('@import "./turbo_turbo/base"')
+        return
+      end
+
+      # Add import at the top of the file
+      content = "@import \"./turbo_turbo/base\";\n\n#{content}"
+      File.write(css_file, content)
+    end
+
+    def gem_root
+      @gem_root ||= File.expand_path("../../..", __dir__)
+    end
+
     private
 
     def modify_erb_layout(content)
@@ -304,6 +350,87 @@ RSpec.describe "TurboTurbo Install Generator Integration" do
 
         expect(result[:file]).to eq("app/views/layouts/application.html.slim")
       end
+    end
+  end
+
+  describe "CSS file copying and import" do
+    let(:main_css_file) { "app/assets/stylesheets/application.tailwind.css" }
+
+    before do
+      # Create the main CSS file
+      FileUtils.mkdir_p("app/assets/stylesheets")
+      File.write(main_css_file, "@tailwind base;\n@tailwind components;\n@tailwind utilities;")
+
+      # Create the source CSS files that the gem would have
+      gem_css_dir = File.join(File.expand_path("../../..", __dir__), "app/assets/stylesheets")
+      gem_css_subdir = File.join(gem_css_dir, "turbo_turbo")
+
+      FileUtils.mkdir_p(gem_css_dir)
+      FileUtils.mkdir_p(gem_css_subdir)
+
+      # Create base.css file in subdirectory
+      unless File.exist?(File.join(gem_css_subdir, "base.css"))
+        File.write(File.join(gem_css_subdir, "base.css"), "/* TurboTurbo CSS */")
+      end
+
+      # Create component CSS files
+      unless File.exist?(File.join(gem_css_subdir, "alerts.css"))
+        File.write(File.join(gem_css_subdir, "alerts.css"), "/* Alerts CSS */")
+      end
+      unless File.exist?(File.join(gem_css_subdir, "button.css"))
+        File.write(File.join(gem_css_subdir, "button.css"), "/* Button CSS */")
+      end
+      unless File.exist?(File.join(gem_css_subdir, "modal.css"))
+        File.write(File.join(gem_css_subdir, "modal.css"), "/* Modal CSS */")
+      end
+    end
+
+    after do
+      FileUtils.rm_rf("app/assets/stylesheets/turbo_turbo")
+      FileUtils.rm_f(main_css_file)
+    end
+
+    it "copies CSS file and adds import" do
+      generator.add_css_import
+
+      # Check that the CSS subdirectory was copied
+      expect(File.exist?("app/assets/stylesheets/turbo_turbo")).to be true
+      expect(File.exist?("app/assets/stylesheets/turbo_turbo/base.css")).to be true
+      expect(File.exist?("app/assets/stylesheets/turbo_turbo/alerts.css")).to be true
+      expect(File.exist?("app/assets/stylesheets/turbo_turbo/button.css")).to be true
+      expect(File.exist?("app/assets/stylesheets/turbo_turbo/modal.css")).to be true
+
+      # Check that the import was added
+      main_css_content = File.read(main_css_file)
+      expect(main_css_content).to include('@import "./turbo_turbo/base";')
+    end
+
+    it "doesn't copy CSS file if it already exists" do
+      # Pre-create the CSS subdirectory
+      FileUtils.mkdir_p("app/assets/stylesheets/turbo_turbo")
+      File.write("app/assets/stylesheets/turbo_turbo/base.css", "/* existing base content */")
+      File.write("app/assets/stylesheets/turbo_turbo/alerts.css", "/* existing alerts */")
+
+      generator.add_css_import
+
+      # Check that the existing content is preserved
+      base_content = File.read("app/assets/stylesheets/turbo_turbo/base.css")
+      expect(base_content).to eq("/* existing base content */")
+
+      # Check that subdirectory content is preserved
+      alerts_content = File.read("app/assets/stylesheets/turbo_turbo/alerts.css")
+      expect(alerts_content).to eq("/* existing alerts */")
+    end
+
+    it "doesn't add import if it already exists" do
+      # Pre-add the import
+      File.write(main_css_file, '@import "./turbo_turbo/base";\n@tailwind base;')
+
+      generator.add_css_import
+
+      # Check that the import wasn't duplicated
+      content = File.read(main_css_file)
+      expect(content.scan(%r{@import "\./turbo_turbo/base"}).length).to eq(1)
     end
   end
 end

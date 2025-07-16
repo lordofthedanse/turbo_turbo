@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "rails/generators/base"
+require "fileutils"
 
 module TurboTurbo
   module Generators
@@ -95,6 +96,38 @@ module TurboTurbo
       end
 
       def add_css_import
+        copy_css_file_to_app
+        add_css_import_to_main_file
+      end
+
+      private
+
+      def copy_css_file_to_app
+        # Copy the TurboTurbo CSS files from the gem to the app
+        gem_css_dir = File.join(gem_root, "app/assets/stylesheets")
+        app_css_dir = "app/assets/stylesheets"
+
+        # CSS subdirectory (now contains base.css and component CSS files)
+        gem_css_subdir = File.join(gem_css_dir, "turbo_turbo")
+        app_css_subdir = File.join(app_css_dir, "turbo_turbo")
+
+        unless File.exist?(gem_css_subdir)
+          say "Warning: Could not find turbo_turbo CSS directory in the gem", :red
+          return
+        end
+
+        if File.exist?(app_css_subdir)
+          say "TurboTurbo CSS directory already exists in #{app_css_dir}", :blue
+          return
+        end
+
+        # Copy CSS subdirectory (contains base.css and component files)
+        FileUtils.cp_r(gem_css_subdir, app_css_subdir)
+
+        say "Copied TurboTurbo CSS files to #{app_css_dir}/turbo_turbo", :green
+      end
+
+      def add_css_import_to_main_file
         css_files = [
           "app/assets/stylesheets/application.tailwind.css",
           "app/assets/stylesheets/application.css"
@@ -104,22 +137,26 @@ module TurboTurbo
 
         unless css_file
           say "Warning: Could not find application.tailwind.css or application.css", :red
-          say "Please manually add '@import \"turbo_turbo\";' to your main CSS file", :red
+          say "Please manually add '@import \"./turbo_turbo.css\";' to your main CSS file", :red
           return
         end
 
         content = File.read(css_file)
 
-        # Check if import already exists
-        if content.include?('@import "turbo_turbo"')
+        # Check if import already exists (check for both old and new import formats)
+        if content.include?('@import "turbo_turbo"') || content.include?('@import "./turbo_turbo"') || content.include?('@import "./turbo_turbo.css"') || content.include?('@import "./turbo_turbo/base"')
           say "TurboTurbo CSS import already exists in #{css_file}", :blue
           return
         end
 
-        # Add import at the top of the file
-        content = "@import \"turbo_turbo\";\n\n#{content}"
+        # Add import at the top of the file (using relative path to base.css)
+        content = "@import \"./turbo_turbo/base\";\n\n#{content}"
         File.write(css_file, content)
         say "Added TurboTurbo CSS import to #{css_file}", :green
+      end
+
+      def gem_root
+        @gem_root ||= File.expand_path("../../..", __dir__)
       end
 
       def modify_layout_file
@@ -159,6 +196,7 @@ module TurboTurbo
         say "✅ Stimulus controllers registered in index.js"
         say "✅ ApplicationController configured with TurboTurbo::ControllerHelpers"
         say "✅ Flash types configured (:success, :error, :warning, :info)"
+        say "✅ CSS files copied to app/assets/stylesheets/turbo_turbo/"
         say "✅ CSS import added to main stylesheet"
         say "✅ Body tag configured with turbo-turbo--modal controller"
         say "✅ Flash messages render added"
@@ -171,8 +209,6 @@ module TurboTurbo
         say "• Run 'rails generate turbo_turbo:layout [LAYOUT_NAME]' for custom layouts"
         say "\nFor usage examples, see: https://github.com/lordofthedanse/turbo_turbo"
       end
-
-      private
 
       def modify_erb_layout(content)
         # Add turbo-turbo--modal to data-controller if not present
