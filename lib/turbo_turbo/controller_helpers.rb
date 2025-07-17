@@ -43,13 +43,13 @@ module TurboTurbo
       if validation_error_action?
         render turbo_stream: turbo_stream.update(
           :error_message_turbo_turbo,
-          partial: "shared/turbo_turbo/error_message",
+          partial: "turbo_turbo/error_message",
           locals: { message: validation_error_messages(object) }
         ), status: :unprocessable_entity
       elsif flash_error_action?
         render turbo_stream: turbo_stream.replace(
           :flashes_turbo_turbo,
-          partial: "layouts/turbo_turbo/flashes",
+          partial: "turbo_turbo/flashes",
           locals: { flash: turbo_flash_error_message(flash_reference(object, flash_naming_attribute)) }
         )
       end
