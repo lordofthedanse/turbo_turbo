@@ -78,7 +78,7 @@ module TurboTurbo
     # ========================================
 
     def replace_turbo_flashes(flash_reference)
-      turbo_stream.replace(:flashes_turbo_turbo, partial: "layouts/turbo_turbo/flashes",
+      turbo_stream.replace(:flashes_turbo_turbo, partial: "turbo_turbo/flashes",
                                                  locals: { flash: turbo_flash_success_message(flash_reference) })
     end
 
