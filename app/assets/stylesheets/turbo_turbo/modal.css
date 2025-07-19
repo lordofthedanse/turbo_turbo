@@ -1,0 +1,81 @@
+.ModalBackground-turbo-turbo {
+  @apply fixed inset-0 bg-gray-500 bg-opacity-70 invisible;
+  transition: opacity 300ms ease-out;
+  opacity: 0;
+  z-index: 99998;
+}
+
+.ModalBackground-turbo-turbo.show {
+  @apply visible;
+  opacity: 1;
+}
+
+.ModalBackdrop-turbo-turbo {
+  z-index: 99999;
+  @apply fixed inset-0 w-full h-full overflow-y-auto items-end justify-center p-4 text-center sm:items-center sm:p-0;
+  display: flex;
+  transform: translateY(100%);
+  transition: transform 300ms ease-out;
+}
+
+.ModalBackdrop-turbo-turbo.show {
+  transform: translateY(0);
+}
+
+.Modal-turbo-turbo {
+  z-index: 100000;
+  @apply relative transform rounded-lg bg-white m-8 text-left;
+  transition: transform 300ms ease-out, opacity 300ms ease-out;
+  transform: translateY(1rem);
+  min-width: 320px;
+
+  & .input.radio_buttons, .input.check_boxes {
+    @apply grow-0 !important;
+  }
+
+  & .radio input, .checkbox input {
+    @apply p-2.5 mr-2 !important;
+  }
+
+  & .radio input {
+    @apply rounded-full;
+  }
+
+  & .checkbox input {
+    @apply rounded-md;
+  }
+
+  & input.radio_buttons {
+    @apply text-primary-700;
+  }
+
+  & textarea, trix-editor, input.string {
+    @apply grow border-0 rounded-md ring-1 ring-inset ring-gray-300 w-full !important;
+
+    &:focus {
+      @apply ring-primary-600 !important;
+    }
+  }
+
+  & .radio label, .checkbox label {
+    @apply flex items-center;
+  }
+}
+
+.Modal-turbo-turbo.show {
+  transform: translateY(0);
+}
+
+.ModalTitle-turbo-turbo {
+  @apply text-base rounded-t-lg leading-6 text-white bg-primary-300 p-4 mb-2;
+}
+
+.ModalBody-turbo-turbo {
+  @apply flex-auto overflow-auto flex flex-col;
+  padding-top: 0;
+}
+
+.ModalContent-turbo-turbo {
+  @apply flex flex-col grow overflow-auto px-4;
+  overflow-y: auto;
+}
