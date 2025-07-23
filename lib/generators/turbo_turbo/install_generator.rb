@@ -193,28 +193,28 @@ module TurboTurbo
         # Copy routes file to config/routes/
         empty_directory "config/routes"
         copy_file "config/routes/turbo_turbo.rb", "config/routes/turbo_turbo.rb"
-        
+
         # Add draw(:turbo_turbo) to main routes.rb
         routes_file = "config/routes.rb"
-        
+
         unless File.exist?(routes_file)
           say "Warning: Could not find #{routes_file}", :yellow
           return
         end
-        
+
         content = File.read(routes_file)
-        
+
         # Check if draw(:turbo_turbo) already exists
         if content.include?("draw(:turbo_turbo)") || content.include?('draw("turbo_turbo")')
           say "TurboTurbo routes already included in #{routes_file}", :blue
           return
         end
-        
+
         # Add draw(:turbo_turbo) before the final 'end'
         content = content.gsub(/(\s*end\s*)$/) do
           "  draw(:turbo_turbo)\n#{::Regexp.last_match(1)}"
         end
-        
+
         File.write(routes_file, content)
         say "Added draw(:turbo_turbo) to #{routes_file}", :green
       end

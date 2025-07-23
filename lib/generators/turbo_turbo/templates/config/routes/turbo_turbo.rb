@@ -9,12 +9,12 @@ namespace :turbo_turbo do
     # Add your admin resources here
     # Example: resources :pathways, only: [:new, :create, :show, :edit, :update, :destroy]
   end
-  
+
   # Provider namespace for provider modal operations
   namespace :provider do
     # Add your provider resources here
     # Example: resources :pathways, only: [:new, :create, :show, :edit, :update, :destroy]
   end
-  
+
   # Add other namespaces as needed
 end
