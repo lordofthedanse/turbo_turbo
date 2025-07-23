@@ -5,7 +5,11 @@ RSpec.describe TurboTurbo do
     expect(TurboTurbo::VERSION).not_to be nil
   end
 
-  it "does something useful" do
-    expect(false).to eq(true)
+  it "includes ControllerHelpers module" do
+    expect(TurboTurbo::ControllerHelpers).to be_a(Module)
+  end
+
+  it "has an Engine class" do
+    expect(TurboTurbo::Engine).to be < Rails::Engine
   end
 end
