@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git tag:*)",
+      "Bash(gem build:*)",
+      "Bash(gem push:*)",
+      "Bash(mv:*)",
+      "Bash(ls:*)",
+      "Bash(bundle exec:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": []
+  }
+}

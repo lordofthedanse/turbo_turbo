@@ -192,9 +192,9 @@ module TurboTurbo
       def install_routes
         # Copy routes file to config/routes/
         empty_directory "config/routes"
-        copy_file "config/routes/turbo_turbo.rb", "config/routes/turbo_turbo.rb"
+        copy_file "config/routes/turbo_turbo_routes.rb", "config/routes/turbo_turbo_routes.rb"
 
-        # Add draw(:turbo_turbo) to main routes.rb
+        # Add draw(:turbo_turbo_routes) to main routes.rb
         routes_file = "config/routes.rb"
 
         unless File.exist?(routes_file)
@@ -204,19 +204,19 @@ module TurboTurbo
 
         content = File.read(routes_file)
 
-        # Check if draw(:turbo_turbo) already exists
-        if content.include?("draw(:turbo_turbo)") || content.include?('draw("turbo_turbo")')
+        # Check if draw(:turbo_turbo_routes) already exists
+        if content.include?("draw(:turbo_turbo_routes)") || content.include?('draw("turbo_turbo_routes")')
           say "TurboTurbo routes already included in #{routes_file}", :blue
           return
         end
 
-        # Add draw(:turbo_turbo) before the final 'end'
+        # Add draw(:turbo_turbo_routes) before the final 'end'
         content = content.gsub(/(\s*end\s*)$/) do
-          "  draw(:turbo_turbo)\n#{::Regexp.last_match(1)}"
+          "  draw(:turbo_turbo_routes)\n#{::Regexp.last_match(1)}"
         end
 
         File.write(routes_file, content)
-        say "Added draw(:turbo_turbo) to #{routes_file}", :green
+        say "Added draw(:turbo_turbo_routes) to #{routes_file}", :green
       end
 
       def display_instructions
@@ -232,11 +232,11 @@ module TurboTurbo
         say "✅ Flash messages render added"
         say "✅ Modal background render added"
         say "✅ TurboTurbo::ModalComponent render added"
-        say "✅ TurboTurbo routes template copied to config/routes/turbo_turbo.rb"
-        say "✅ draw(:turbo_turbo) added to config/routes.rb"
+        say "✅ TurboTurbo routes template copied to config/routes/turbo_turbo_routes.rb"
+        say "✅ draw(:turbo_turbo_routes) added to config/routes.rb"
         say "\nNext steps:"
         say "🚀 You're ready to use TurboTurbo! Start by adding turbo_actions to your controllers."
-        say "📝 Add your modal routes to config/routes/turbo_turbo.rb"
+        say "📝 Add your modal routes to config/routes/turbo_turbo_routes.rb"
         say "\nOptional:"
         say "• Run 'rails generate turbo_turbo:views' to copy ViewComponents for customization"
         say "• Run 'rails generate turbo_turbo:layout [LAYOUT_NAME]' for custom layouts"

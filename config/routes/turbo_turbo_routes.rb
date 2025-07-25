@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # TurboTurbo routes for modal-based CRUD operations
-# Add `draw(:turbo_turbo)` to your main routes.rb file to include these routes
+# Add `draw(:turbo_turbo_routes)` to your main routes.rb file to include these routes
 
 namespace :turbo_turbo do
   # Admin namespace for administrative modal operations
